@@ -2,8 +2,9 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 
-public class Ball2 extends EntidadJuego {
+public class Ball2 extends EntidadJuego implements Collidable {
 
     public Ball2(float x, float y, int size, int xVel, int yVel, Texture texture) {
         super(x, y, texture);
@@ -28,21 +29,8 @@ public class Ball2 extends EntidadJuego {
         setPosition(x, y);
     }
 
-    public boolean checkCollision(Ball2 b2) {
-        if (getArea().overlaps(b2.getArea())) {
-            // Rebote
-            setVelX(-getXVel());
-            b2.setVelX(-b2.getXVel());
-
-            setVelY(-getYVel());
-            b2.setVelY(-b2.getYVel());
-
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isDestroyed() {
-        return false; // Asume que Ball2 no se destruye al colisionar
+    @Override
+    public boolean checkCollision(Collidable other) {
+        return getArea().overlaps(other.getArea());
     }
 }

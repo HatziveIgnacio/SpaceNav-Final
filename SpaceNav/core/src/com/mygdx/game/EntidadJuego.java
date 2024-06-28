@@ -80,4 +80,6 @@ public abstract class EntidadJuego {
     public void dispose() {
         sprite.getTexture().dispose();
     }
+    
+    
 }

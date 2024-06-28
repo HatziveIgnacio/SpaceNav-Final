@@ -64,6 +64,7 @@ public class PantallaGameOver implements Screen {
         // Empty method, not used in this context
     }
 
+
     public void dispose() {
         font.dispose();
     }

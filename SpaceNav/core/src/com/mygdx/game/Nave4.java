@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,7 +14,7 @@ public class Nave4 extends EntidadJuego {
     private Sound sonidoDisparo;
     private Texture texturaBala;
     private Array<Bullet> balas;
-    private float maxVel = 200f; // Ajustamos la velocidad máxima de la nave
+    private float maxVel = 300f; // Ajustamos la velocidad máxima de la nave
 
     public Nave4(int x, int y, Texture texture, Sound sonidoDisparo, Texture texturaBala, Sound sonidoHerido) {
         super(x, y, texture);
@@ -29,30 +28,16 @@ public class Nave4 extends EntidadJuego {
 
     @Override
     public void update() {
-        handleInput();
-
+        // Actualizar la posición de la nave
         x += getXVel() * Gdx.graphics.getDeltaTime();
         y += getYVel() * Gdx.graphics.getDeltaTime();
         setPosition(x, y);
 
-        if (herido) {
-            tiempoHerido -= Gdx.graphics.getDeltaTime();
-            if (tiempoHerido <= 0) {
-                herido = false;
-            }
-        }
+        // Gestionar el tiempo de invulnerabilidad
+        manejarInvulnerabilidad();
 
-        for (Bullet bala : balas) {
-            bala.update();
-        }
-
-        // Eliminar balas destruidas
-        for (int i = 0; i < balas.size; i++) {
-            if (balas.get(i).isDestroyed()) {
-                balas.removeIndex(i);
-                i--; // Ajustar el índice después de eliminar un elemento
-            }
-        }
+        // Actualizar las balas
+        actualizarBalas();
     }
 
     @Override
@@ -64,28 +49,26 @@ public class Nave4 extends EntidadJuego {
         }
     }
 
-    public void handleInput() {
-        if (!herido) {
-            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                setVelocity(-maxVel, getYVel());
-            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                setVelocity(maxVel, getYVel());
-            } else {
-                setVelocity(0, getYVel());
+    private void manejarInvulnerabilidad() {
+        if (herido) {
+            tiempoHerido -= Gdx.graphics.getDeltaTime();
+            if (tiempoHerido <= 0) {
+                herido = false;
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                setVelocity(getXVel(), maxVel);
-            } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                setVelocity(getXVel(), -maxVel);
-            } else {
-                setVelocity(getXVel(), 0);
-            }
+        }
+    }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                disparar();
+    private void actualizarBalas() {
+        for (Bullet bala : balas) {
+            bala.update();
+        }
+
+        // Eliminar balas destruidas
+        for (int i = 0; i < balas.size; i++) {
+            if (balas.get(i).isDestroyed()) {
+                balas.removeIndex(i);
+                i--; // Ajustar el índice después de eliminar un elemento
             }
-        } else {
-            setVelocity(0, 0);
         }
     }
 
@@ -120,8 +103,12 @@ public class Nave4 extends EntidadJuego {
         this.tiempoHerido = tiempoHerido;
     }
 
+    public float getMaxVel() {
+        return maxVel;
+    }
+
     public void disparar() {
-        Bullet bala = new Bullet(this.x + this.sprite.getWidth() / 2, this.y + this.sprite.getHeight(), 0, 100, texturaBala);
+        Bullet bala = new Bullet(this.x + this.sprite.getWidth() / 2, this.y + this.sprite.getHeight(), 0, 250, texturaBala);
         balas.add(bala);
         sonidoDisparo.play();
     }

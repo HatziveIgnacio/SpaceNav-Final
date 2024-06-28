@@ -45,8 +45,17 @@ public class Ball2 extends EntidadJuego implements Collidable {
         setPosition(x, y);
     }
 
-
     public boolean checkCollision(Collidable other) {
         return getArea().overlaps(other.getArea());
+    }
+
+    public boolean isCollidingWith(Ball2 other) {
+        return this.getArea().overlaps(other.getArea());
+    }
+
+    public void bounceOff(Ball2 other) {
+
+        this.setVelocity(-this.xVel, -this.yVel);
+        other.setVelocity(-other.xVel, -other.yVel);
     }
 }

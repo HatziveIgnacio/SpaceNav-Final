@@ -19,7 +19,7 @@ public class Nave4 extends EntidadJuego {
     private Texture texturaOriginal;
     private Texture texturaHerido;
     private Array<Bullet> balas;
-    private float maxVel = 300f; // Ajustamos la velocidad máxima de la nave
+    private float maxVel = 250f; // Ajustamos la velocidad máxima de la nave
     private float shakeDuration;
     private float shakeIntensity;
     private float originalX;
@@ -40,7 +40,6 @@ public class Nave4 extends EntidadJuego {
         this.texturaHerido = texturaHerido;
     }
 
-    @Override
     public void update() {
         if (congelado) {
             tiempoCongelado -= Gdx.graphics.getDeltaTime();
@@ -81,7 +80,7 @@ public class Nave4 extends EntidadJuego {
         actualizarBalas();
     }
 
-    @Override
+    
     public void draw(SpriteBatch batch) {
         super.draw(batch);
 
@@ -118,7 +117,7 @@ public class Nave4 extends EntidadJuego {
     public boolean checkCollision(Ball2 asteroide) {
         if (!herido && getArea().overlaps(asteroide.getArea())) {
             herido = true;
-            tiempoHerido = 3;
+            tiempoHerido = 0.5f;
             vidas--;
             sonidoHerido.play();
             iniciarCongelacion();
@@ -129,8 +128,8 @@ public class Nave4 extends EntidadJuego {
 
     private void iniciarCongelacion() {
         congelado = true;
-        tiempoCongelado = 1f; // Congelar por 1 segundo
-        shakeDuration = 1f; // Duración del efecto de shake
+        tiempoCongelado = 0.3f; // Congelar por 1 segundo
+        shakeDuration = 0.3f; // Duración del efecto de shake
         shakeIntensity = 5f; // Intensidad del efecto de shake
     }
 

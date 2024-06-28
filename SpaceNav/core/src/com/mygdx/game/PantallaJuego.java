@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +18,7 @@ public class PantallaJuego implements Screen {
     private final SpaceNavigation game;
     private int ronda;
     private int velXAsteroides;
-    private  int velYAsteroides;
+    private int velYAsteroides;
     private int cantAsteroides;
     private int score;
     private OrthographicCamera camera;
@@ -41,6 +42,7 @@ public class PantallaJuego implements Screen {
         camera.setToOrtho(false, 800, 640);
 
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
+        explosionSound.setVolume(1, 0.5f);
         gameMusic = Gdx.audio.newMusic(Gdx.files.internal("piano-loops.wav"));
 
         gameMusic.setLooping(true);
@@ -51,8 +53,7 @@ public class PantallaJuego implements Screen {
                 new Texture(Gdx.files.internal("MainShip3.png")),
                 Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")),
                 new Texture(Gdx.files.internal("Rocket2.png")),
-                Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")),
-                this);
+                Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")));
         nave.setVidas(vidas);
 
         asteroides = new ArrayList<>();
@@ -61,103 +62,114 @@ public class PantallaJuego implements Screen {
         // Inicializar asteroides...
         Random r = new Random();
         for (int i = 0; i < cantAsteroides; i++) {
+            int size = 20; // Definir el tamaño del asteroide
             Ball2 asteroide = new Ball2(
-                r.nextInt(Gdx.graphics.getWidth()), 
-                50 + r.nextInt(Gdx.graphics.getHeight() - 50), 
-                new Texture(Gdx.files.internal("aGreyMedium4.png"))
+                    r.nextInt(Gdx.graphics.getWidth()),
+                    50 + r.nextInt(Gdx.graphics.getHeight() - 50),
+                    size, velXAsteroides, velYAsteroides,
+                    new Texture(Gdx.files.internal("aGreyMedium4.png"))
             );
             asteroides.add(asteroide);
         }
     }
 
-    public void show() {
+    public void dibujaEncabezado() {
+        CharSequence str = "Vidas: " + nave.getVidas() + " Ronda: " + ronda;
+        game.getFont().getData().setScale(2f);
+        game.getFont().draw(batch, str, 10, 30);
+        game.getFont().draw(batch, "Score: " + this.score, Gdx.graphics.getWidth() - 150, 30);
     }
 
     public void render(float delta) {
-        // Limpiar pantalla y configurar cámara
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        // Limpiar pantalla
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        camera.update();
-        batch.setProjectionMatrix(camera.combined);
 
-        // Dibujar elementos del juego
+        // Actualizar el estado del juego
+        actualizarJuego(delta);
+
+        // Dibujar el juego
+        dibujarJuego();
+    }
+
+    private void actualizarJuego(float delta) {
+        nave.update(); // Actualiza la nave y sus balas
+
+        if (!nave.isHerido()) {
+            manejarColisionesBalasAsteroides();
+            manejarColisionesNaveAsteroides();
+        }
+
+        for (Ball2 ball : asteroides) {
+            ball.update();
+        }
+    }
+
+    private void dibujarJuego() {
         batch.begin();
-        game.getFont().draw(batch, "Vidas: " + nave.getVidas(), 20, Gdx.graphics.getHeight() - 20);
-        game.getFont().draw(batch, "Puntaje: " + score, 20, Gdx.graphics.getHeight() - 40);
-        game.getFont().draw(batch, "Ronda: " + ronda, 20, Gdx.graphics.getHeight() - 60);
+        dibujaEncabezado();
+
+        for (Bullet b : nave.getBalas()) {
+            b.draw(batch);
+        }
+
         nave.draw(batch);
+
         for (Ball2 asteroide : asteroides) {
             asteroide.draw(batch);
         }
-        for (Bullet bala : balas) {
-            bala.draw(batch);
-        }
+
         batch.end();
+    }
 
-        // Actualizar lógica del juego
-        nave.update();
-        for (Ball2 asteroide : asteroides) {
-            asteroide.update();
-        }
-        for (Bullet bala : balas) {
-            bala.update();
-        }
-
-        // Detección de colisiones entre balas y asteroides
-        Iterator<Bullet> balaIterator = balas.iterator();
-        while (balaIterator.hasNext()) {
-            Bullet bala = balaIterator.next();
-            Iterator<Ball2> asteroideIterator = asteroides.iterator();
-            while (asteroideIterator.hasNext()) {
-                Ball2 asteroide = asteroideIterator.next();
-                if (bala.getBoundingRectangle().overlaps(asteroide.getBoundingRectangle())) {
-                    balaIterator.remove();
-                    asteroideIterator.remove();
-                    score += 10; // Aumentar el puntaje cuando se destruye un asteroide
+    private void manejarColisionesBalasAsteroides() {
+        for (Iterator<Bullet> itBalas = nave.getBalas().iterator(); itBalas.hasNext(); ) {
+            Bullet bala = itBalas.next();
+            for (Iterator<Ball2> itAsteroides = asteroides.iterator(); itAsteroides.hasNext(); ) {
+                Ball2 asteroide = itAsteroides.next();
+                if (bala.checkCollision(asteroide)) {
+                    itAsteroides.remove();
+                    itBalas.remove();
+                    this.score += 10;
                     explosionSound.play();
                     break;
                 }
             }
         }
+    }
 
-     // Detección de colisiones entre la nave y los asteroides
-        for (Ball2 asteroide : asteroides) {
+    private void manejarColisionesNaveAsteroides() {
+        for (Iterator<Ball2> itAsteroides = asteroides.iterator(); itAsteroides.hasNext(); ) {
+            Ball2 asteroide = itAsteroides.next();
             if (nave.checkCollision(asteroide)) {
-                if (!nave.isHerido()) {
-                    nave.setVidas(nave.getVidas() - 1);
-                    nave.setHerido(true);
-                    
-                }
-                asteroides.remove(asteroide);
+                itAsteroides.remove();
+                nave.setHerido(true);
+                nave.setTiempoHerido(3);
+                nave.setVidas(nave.getVidas() - 1);
                 explosionSound.play();
-                break;
+
+                // Verificar si la nave se quedó sin vidas
+                if (nave.getVidas() <= 0) {
+                    if (score > game.getHighScore()) {
+                        game.setHighScore(score);
+                    }
+                    game.setScreen(new PantallaGameOver(game)); // Cambiar a la pantalla de Game Over
+                    dispose();
+                    return;
+                }
             }
         }
-        
-        
-        // Verificar fin del juego
-        if (nave.getVidas() <= 0) {
-            // Cambiar a la pantalla de juego terminado
-            game.setScreen(new PantallaGameOver(game));
-            dispose(); // Liberar recursos de la pantalla actual
-            return; // Salir del método render() para evitar procesamiento adicional
-        }
 
-        // Verificar paso de ronda
         if (asteroides.isEmpty()) {
-            // Incrementar la ronda y reiniciar el juego
-            ronda++;
-            velXAsteroides += ronda; // Aumentar la velocidad X en función de la ronda
-            velYAsteroides += ronda; // Aumentar la velocidad Y en función de la ronda
-            cantAsteroides += 5;
-            game.setScreen(new PantallaJuego(game, ronda, nave.getVidas(), 0, velXAsteroides, velYAsteroides, cantAsteroides));
-            dispose(); // Liberar recursos de la pantalla actual
-            return; // Salir del método render() para evitar procesamiento adicional
+        	velXAsteroides += 5;
+            velYAsteroides += 5;
+            dispose();
+            game.setScreen(new PantallaJuego(game, ronda + 1, nave.getVidas(), score,
+                    velXAsteroides + 3, velYAsteroides + 3, cantAsteroides + 10));
         }
     }
 
-    public void agregarBala(Bullet bala) {
-        balas.add(bala);
+    @Override
+    public void show() {
     }
 
     @Override
@@ -178,7 +190,12 @@ public class PantallaJuego implements Screen {
 
     @Override
     public void dispose() {
-        explosionSound.dispose();
+        batch.dispose();
         gameMusic.dispose();
+        explosionSound.dispose();
+        nave.dispose();
+        for (Ball2 asteroide : asteroides) {
+            asteroide.dispose();
+        }
     }
 }

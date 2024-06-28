@@ -15,23 +15,25 @@ public class Nave4 extends EntidadJuego {
     private Sound sonidoDisparo;
     private Texture texturaBala;
     private Array<Bullet> balas;
-    private float maxVel = 10f; // Definimos la variable maxVel
+    private float maxVel = 200f; // Ajustamos la velocidad máxima de la nave
 
-    public Nave4(float x, float y, Texture texture, Sound sonidoDisparo, Texture texturaBala, Sound sonidoExplosion, PantallaJuego pantallaJuego) {
+    public Nave4(int x, int y, Texture texture, Sound sonidoDisparo, Texture texturaBala, Sound sonidoHerido) {
         super(x, y, texture);
         this.herido = false;
         this.vidas = 3;
         this.sonidoDisparo = sonidoDisparo;
         this.texturaBala = texturaBala;
-        this.sonidoHerido = sonidoDisparo;
+        this.sonidoHerido = sonidoHerido;
         this.balas = new Array<>();
     }
 
     @Override
     public void update() {
-        this.x += this.xVel;
-        this.y += this.yVel;
-        this.sprite.setPosition(this.x, this.y);
+        handleInput();
+
+        x += getXVel() * Gdx.graphics.getDeltaTime();
+        y += getYVel() * Gdx.graphics.getDeltaTime();
+        setPosition(x, y);
 
         if (herido) {
             tiempoHerido -= Gdx.graphics.getDeltaTime();
@@ -43,45 +45,61 @@ public class Nave4 extends EntidadJuego {
         for (Bullet bala : balas) {
             bala.update();
         }
+
+        // Eliminar balas destruidas
+        for (int i = 0; i < balas.size; i++) {
+            if (balas.get(i).isDestroyed()) {
+                balas.removeIndex(i);
+                i--; // Ajustar el índice después de eliminar un elemento
+            }
+        }
     }
 
     @Override
     public void draw(SpriteBatch batch) {
         super.draw(batch);
+
         for (Bullet bala : balas) {
             bala.draw(batch);
         }
     }
 
     public void handleInput() {
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            xVel = -maxVel;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            xVel = maxVel;
-        } else {
-            xVel = 0;
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            yVel = maxVel;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            yVel = -maxVel;
-        } else {
-            yVel = 0;
-        }
+        if (!herido) {
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                setVelocity(-maxVel, getYVel());
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                setVelocity(maxVel, getYVel());
+            } else {
+                setVelocity(0, getYVel());
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                setVelocity(getXVel(), maxVel);
+            } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                setVelocity(getXVel(), -maxVel);
+            } else {
+                setVelocity(getXVel(), 0);
+            }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            disparar();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                disparar();
+            }
+        } else {
+            setVelocity(0, 0);
         }
     }
 
     public boolean checkCollision(Ball2 asteroide) {
-        return sprite.getBoundingRectangle().overlaps(asteroide.getBoundingRectangle());
+        if (!herido && getArea().overlaps(asteroide.getArea())) {
+            herido = true;
+            tiempoHerido = 3;
+            vidas--;
+            sonidoHerido.play();
+            return true;
+        }
+        return false;
     }
 
-    public void setVidas1(int vidas) {
-        this.vidas = vidas;
-    }
-    
     public boolean isHerido() {
         return herido;
     }
@@ -89,7 +107,6 @@ public class Nave4 extends EntidadJuego {
     public void setHerido(boolean herido) {
         this.herido = herido;
     }
-
 
     public int getVidas() {
         return vidas;
@@ -99,19 +116,17 @@ public class Nave4 extends EntidadJuego {
         this.vidas = vidas;
     }
 
-    public Sound getSonidoHerido() {
-        return sonidoHerido;
-    }
-    
     public void setTiempoHerido(int tiempoHerido) {
         this.tiempoHerido = tiempoHerido;
     }
+
     public void disparar() {
-        Bullet bala = new Bullet(this.x + this.sprite.getWidth() / 2, this.y + this.sprite.getHeight(), texturaBala);
+        Bullet bala = new Bullet(this.x + this.sprite.getWidth() / 2, this.y + this.sprite.getHeight(), 0, 100, texturaBala);
         balas.add(bala);
         sonidoDisparo.play();
     }
 
-	
-	
+    public Array<Bullet> getBalas() {
+        return balas;
+    }
 }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public abstract class EntidadJuego {
-	protected float x;
+    protected float x;
     protected float y;
     protected float xVel;
     protected float yVel;
@@ -28,17 +28,16 @@ public abstract class EntidadJuego {
         return sprite.getBoundingRectangle();
     }
 
-
     public float getX() {
         return x;
     }
-    
+
     public float getY() {
         return y;
     }
-    
+
     public Sprite getSprite() {
-    	return this.sprite;
+        return this.sprite;
     }
 
     public void setPosition(float x, float y) {
@@ -59,17 +58,26 @@ public abstract class EntidadJuego {
     public float getYVel() {
         return yVel;
     }
-    
+
     public void setVelX(float xVel) {
         this.xVel = xVel;
     }
+
     public void setVelY(float yVel) {
         this.yVel = yVel;
     }
-    
-    public boolean isDestroyed() {return destroyed;}
-    
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
     public void setDestroyed(boolean destroyed) {
-    	this.destroyed = destroyed;
+        this.destroyed = destroyed;
+    }
+
+    public abstract void update();
+    
+    public void dispose() {
+        sprite.getTexture().dispose();
     }
 }

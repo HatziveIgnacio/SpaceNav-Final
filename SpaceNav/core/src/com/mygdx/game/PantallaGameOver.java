@@ -41,32 +41,29 @@ public class PantallaGameOver implements Screen {
         }
     }
 
-    @Override
+
     public void show() {
         // Empty method, not used in this context
     }
 
-    @Override
     public void resize(int width, int height) {
         // Empty method, not used in this context
     }
 
-    @Override
+
     public void pause() {
         // Empty method, not used in this context
     }
 
-    @Override
-    public void resume() {
+   public void resume() {
         // Empty method, not used in this context
     }
 
-    @Override
+
     public void hide() {
         // Empty method, not used in this context
     }
 
-    @Override
     public void dispose() {
         font.dispose();
     }

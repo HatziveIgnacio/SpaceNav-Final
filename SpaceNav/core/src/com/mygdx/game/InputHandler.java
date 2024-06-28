@@ -11,7 +11,7 @@ public class InputHandler {
     }
 
     public void handleInput() {
-        if (!nave.isHerido()) {
+        if (!nave.isCongelado()) {
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 nave.setVelocity(-nave.getMaxVel(), nave.getYVel());
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
@@ -26,12 +26,12 @@ public class InputHandler {
             } else {
                 nave.setVelocity(nave.getXVel(), 0);
             }
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-                nave.disparar();
-            }
         } else {
             nave.setVelocity(0, 0);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            nave.disparar();
         }
     }
 }

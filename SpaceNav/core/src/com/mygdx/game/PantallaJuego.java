@@ -47,27 +47,27 @@ public class PantallaJuego implements Screen {
         gameRenderer.render();
     }
 
-    @Override
+    
     public void show() {
     }
 
-    @Override
+    
     public void resize(int width, int height) {
     }
 
-    @Override
+    
     public void pause() {
     }
 
-    @Override
+    
     public void resume() {
     }
 
-    @Override
+
     public void hide() {
     }
 
-    @Override
+
     public void dispose() {
         batch.dispose();
         gameMusic.dispose();

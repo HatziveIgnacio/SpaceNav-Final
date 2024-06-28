@@ -12,12 +12,14 @@ public abstract class EntidadJuego {
     protected float yVel;
     private boolean destroyed = false;
     protected Sprite sprite;
+    private Rectangle area;
 
     public EntidadJuego(float x, float y, Texture texture) {
         this.x = x;
         this.y = y;
         this.sprite = new Sprite(texture);
         this.sprite.setPosition(x, y);
+        this.area = sprite.getBoundingRectangle();
     }
 
     public void draw(SpriteBatch batch) {
@@ -44,6 +46,7 @@ public abstract class EntidadJuego {
         this.x = x;
         this.y = y;
         this.sprite.setPosition(x, y);
+        this.area.setPosition(x, y); // Actualiza la posición del área de colisión
     }
 
     public void setVelocity(float xVel, float yVel) {
@@ -76,10 +79,8 @@ public abstract class EntidadJuego {
     }
 
     public abstract void update();
-    
+
     public void dispose() {
         sprite.getTexture().dispose();
     }
-    
-    
 }

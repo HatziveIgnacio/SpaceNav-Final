@@ -28,10 +28,13 @@ public class GameLogic {
         this.velYAsteroides = velYAsteroides;
 
         nave = new Nave4(Gdx.graphics.getWidth() / 2 - 50, 30,
-                new Texture(Gdx.files.internal("MainShip3.png")),
-                Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")),
-                new Texture(Gdx.files.internal("Rocket2.png")),
-                Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")));
+        	    new Texture(Gdx.files.internal("MainShip3.png")),
+        	    new Texture(Gdx.files.internal("MainShipDamaged.png")), // Textura de invulnerabilidad
+        	    Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3")),
+        	    new Texture(Gdx.files.internal("Rocket2.png")),
+        	    Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"))
+        	);
+
         nave.setVidas(vidas);
         inputHandler = new InputHandler(nave);
 
@@ -56,7 +59,7 @@ public class GameLogic {
         nave.update();
         inputHandler.handleInput();
 
-        if (!nave.isHerido()) {
+        if (!nave.isHerido() && !nave.isCongelado()) {
             manejarColisionesNaveAsteroides();
         }
         manejarColisionesBalasAsteroides();
@@ -118,21 +121,5 @@ public class GameLogic {
 
     public void setRonda(int ronda) {
         this.ronda = ronda;
-    }
-
-    public int getVelXAsteroides() {
-        return velXAsteroides;
-    }
-
-    public void setVelXAsteroides(int velXAsteroides) {
-        this.velXAsteroides = velXAsteroides;
-    }
-
-    public int getVelYAsteroides() {
-        return velYAsteroides;
-    }
-
-    public void setVelYAsteroides(int velYAsteroides) {
-        this.velYAsteroides = velYAsteroides;
     }
 }

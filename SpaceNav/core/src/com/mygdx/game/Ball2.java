@@ -18,18 +18,34 @@ public class Ball2 extends EntidadJuego implements Collidable {
     }
 
     public void update() {
-        x += getXVel() * Gdx.graphics.getDeltaTime();
-        y += getYVel() * Gdx.graphics.getDeltaTime();
+        // Actualizar posición
+        x += xVel * Gdx.graphics.getDeltaTime();
+        y += yVel * Gdx.graphics.getDeltaTime();
 
-        if (x < 0 || x + sprite.getWidth() > Gdx.graphics.getWidth())
-            setVelX(getXVel() * -1);
-        if (y < 0 || y + sprite.getHeight() > Gdx.graphics.getHeight())
-            setVelY(getYVel() * -1);
+        // Comprobar colisiones con los bordes de la pantalla y rebotar
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        if (x < 0) {
+            x = 0;
+            xVel = -xVel;
+        } else if (x + sprite.getWidth() > screenWidth) {
+            x = screenWidth - sprite.getWidth();
+            xVel = -xVel;
+        }
+
+        if (y < 0) {
+            y = 0;
+            yVel = -yVel;
+        } else if (y + sprite.getHeight() > screenHeight) {
+            y = screenHeight - sprite.getHeight();
+            yVel = -yVel;
+        }
 
         setPosition(x, y);
     }
 
-    @Override
+
     public boolean checkCollision(Collidable other) {
         return getArea().overlaps(other.getArea());
     }

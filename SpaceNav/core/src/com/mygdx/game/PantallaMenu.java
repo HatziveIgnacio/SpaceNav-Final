@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 
@@ -11,12 +13,17 @@ public class PantallaMenu implements Screen {
 
 	private SpaceNavigation game;
 	private OrthographicCamera camera;
+	Texture nuevoFondo;
+	BitmapFont font;
 
 	public PantallaMenu(SpaceNavigation game) {
 		this.game = game;
         
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 1200, 800);
+		
+		nuevoFondo = new Texture(Gdx.files.internal("nuevoFondo.jpeg"));
+        font = new BitmapFont();
 	}
 
 	@Override
@@ -27,6 +34,7 @@ public class PantallaMenu implements Screen {
 		game.getBatch().setProjectionMatrix(camera.combined);
 
 		game.getBatch().begin();
+		game.getBatch().draw(nuevoFondo, 0, 0, 1200, 800); // Dibuja el nuevo fondo
 		game.getFont().draw(game.getBatch(), "Bienvenido a Space Navigation !", 140, 400);
 		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado o presiona cualquier tecla para comenzar ...", 100, 300);
 	

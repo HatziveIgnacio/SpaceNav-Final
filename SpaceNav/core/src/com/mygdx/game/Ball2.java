@@ -53,9 +53,31 @@ public class Ball2 extends EntidadJuego implements Collidable {
         return this.getArea().overlaps(other.getArea());
     }
 
-    public void bounceOff(Ball2 other) {
+	    public void bounceOff(Ball2 other) {
+	        float dx = this.x - other.x;
+	        float dy = this.y - other.y;
+	        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+	        float overlap = 0.1f * (distance - this.sprite.getWidth() - other.sprite.getWidth());
+	
+	        // Desplaza este asteroide
+	        this.x -= overlap * (this.x - other.x) / distance;
+	        this.y -= overlap * (this.y - other.y) / distance;
+	
+	        // Desplaza el otro asteroide
+	        other.x += overlap * (this.x - other.x) / distance;
+	        other.y += overlap * (this.y - other.y) / distance;
+	
+	        // Intercambia las velocidades
+	        float tempXVel = this.xVel;
+	        float tempYVel = this.yVel;
+	        this.xVel = other.xVel;
+	        this.yVel = other.yVel;
+	        other.xVel = tempXVel;
+	        other.yVel = tempYVel;
+	
+	        // Actualiza las posiciones de los sprites
+	        this.setPosition(this.x, this.y);
+	        other.setPosition(other.x, other.y);
+	    }
 
-        this.setVelocity(-this.xVel, -this.yVel);
-        other.setVelocity(-other.xVel, -other.yVel);
-    }
 }

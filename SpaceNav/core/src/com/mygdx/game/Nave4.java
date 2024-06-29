@@ -19,7 +19,7 @@ public class Nave4 extends EntidadJuego {
     private Texture texturaOriginal;
     private Texture texturaHerido;
     private Array<Bullet> balas;
-    private float maxVel = 250f; // Ajustamos la velocidad máxima de la nave
+    private float maxVel = 300f; // Ajustamos la velocidad máxima de la nave
     private float shakeDuration;
     private float shakeIntensity;
     private float originalX;

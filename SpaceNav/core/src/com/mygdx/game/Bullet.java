@@ -10,7 +10,7 @@ public class Bullet extends EntidadJuego implements Collidable {
         setVelocity(xSpeed, ySpeed);
     }
 
-    @Override
+    
     public void update() {
         x += getXVel() * Gdx.graphics.getDeltaTime();
         y += getYVel() * Gdx.graphics.getDeltaTime();
@@ -22,7 +22,7 @@ public class Bullet extends EntidadJuego implements Collidable {
         setPosition(x, y);
     }
 
-    @Override
+    
     public boolean checkCollision(Collidable other) {
         return getArea().overlaps(other.getArea());
     }
